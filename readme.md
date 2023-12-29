@@ -1,29 +1,29 @@
 # NIC (Nest Interaction CLI)
 
-## Sobre o Projeto
+## About the Project
 
-O NIC (Nest Interaction CLI) é uma ferramenta de linha de comando simples, porém poderosa, projetada para agilizar a criação de projetos baseados em templates de funções Lambda. Esta ferramenta facilita a padronização e a eficiência na inicialização de novos projetos, garantindo consistência e qualidade no desenvolvimento.
+NIC (Nest Interaction CLI) is a simple yet powerful command-line tool designed to streamline the creation of Lambda function template-based projects. This tool makes it easier to standardize and enhance efficiency in initiating new projects, ensuring consistency and quality in development.
 
-## Características
+## Features
 
-- **Criação Rápida**: Gere novos projetos Lambda em segundos.
-- **Fácil de Usar**: Interface de linha de comando simples e intuitiva.
-- **Opção de Detalhamento**: Use `-v` ou `--verbose` para um relatório detalhado dos arquivos gerados durante a criação do projeto.
-- **Funcionalidade de Schema do Template**: Especifique um schema para personalizar a criação do seu projeto.
+- **Quick Creation**: Generate new Lambda projects in seconds.
+- **Easy to Use**: Simple and intuitive command-line interface.
+- **Verbose Option**: Use `-v` or `--verbose` for a detailed report of the files generated during project creation.
+- **Template Schema Functionality**: Specify a schema to customize your project creation.
 
-## Funcionalidade de Schema do Template
+## Template Schema Functionality
 
-O NIC permite a especificação de um schema de template para a criação do projeto. Você pode usar um schema de duas maneiras:
+NIC allows the specification of a template schema for project creation. You can use a schema in two ways:
 
-1. **Schema Padrão**: Se um arquivo chamado `schema.txt` estiver presente no diretório atual, o NIC o usará automaticamente.
-2. **Schema Personalizado**: Use a opção `-p` para especificar um caminho personalizado para o arquivo de schema. Por exemplo:
+1. **Default Schema**: If a file named `schema.txt` is present in the current directory, NIC will automatically use it.
+2. **Custom Schema**: Use the `-p` option to specify a custom path for the schema file. For example:
    ```bash
-   nic create [nome-do-projeto] -p ./base/schema.txt
+   nic create [project-name] -p ./base/schema.txt
    ```
 
-### Formato do Schema
+### Schema Format
 
-O arquivo `schema.txt` deve seguir um formato específico, usando snake case para os nomes das propriedades e indicando os tipos de dados. Além disso, você pode marcar campos como opcionais usando um `?`. Aqui está um exemplo de como o schema pode ser estruturado:
+The `schema.txt` file should follow a specific format, using snake case for property names and indicating data types. Additionally, you can mark fields as optional using a `?`. Here is an example of how the schema can be structured:
 
 ```
 country_uid: ?string
@@ -36,43 +36,43 @@ iso_code: string
 timezone: string
 ```
 
-## Como Começar
+## Getting Started
 
-### Pré-requisitos
+### Prerequisites
 
-- [Node.js](https://nodejs.org/) (versão X.X ou superior)
+- [Node.js](https://nodejs.org/) (version X.X or higher)
 - [Git](https://git-scm.com/)
 
-### Instalação
+### Installation
 
 ```bash
-# Clone este repositório
+# Clone this repository
 git clone https://github.com/thiago-js/nest-interaction-cli.git
-# Vá para a pasta do projeto
+# Go to the project folder
 cd nic
-# Instale as dependências
+# Install dependencies
 npm install
-# Link para usar globalmente
+# Link for global use
 npm link
 ```
 
-## Uso
+## Usage
 
 ```bash
-# Para gerar um novo projeto Lambda
-nic create [nome-do-projeto]
-# Para um relatório detalhado dos arquivos gerados
-nic create [nome-do-projeto] -v
-# Para especificar um caminho personalizado para o schema
-nic create [nome-do-projeto] -p ./base/schema.txt
-# Para ajuda
+# To generate a new Lambda project
+nic create [project-name]
+# For a detailed report of the generated files
+nic create [project-name] -v
+# To specify a custom path for the schema
+nic create [project-name] -p ./base/schema.txt
+# For help
 nic --help
 ```
 
-## Contribuições
+## Contributions
 
 :rocket: [thiago simao](thiago-js)
 
-## Licença
+## License
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
