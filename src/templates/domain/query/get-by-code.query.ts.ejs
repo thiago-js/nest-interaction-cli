@@ -1,0 +1,39 @@
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+import { Get<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/get-<%= props.name %>.exception";
+import { NotFound<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/not-found-<%= props.name %>.exception";
+import { I<%= props.nameCapitalize %>Repository } from "@/domain/repository/<%= props.name %>-repository.interface";
+import { ILogger } from "@/infra/logger/logger.client";
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
+export abstract class IGet<%= props.nameCapitalize %>ByCodeQuery {
+  abstract execute(id: number): Promise<<%= props.nameCapitalize %>Entity>;
+}
+
+@Injectable()
+export class Get<%= props.nameCapitalize %>ByCodeQueryHandler implements IGet<%= props.nameCapitalize %>ByCodeQuery {
+  constructor(
+    private readonly _<%= props.name %>Repository: I<%= props.nameCapitalize %>Repository,
+    private readonly _logger: ILogger
+  ) {}
+
+  async execute(id: number): Promise<<%= props.nameCapitalize %>Entity> {
+    this._logger.log(`get <%= props.name %> by code: ${id}`);
+
+    try {
+      const <%= props.name %> = await this._<%= props.name %>Repository.getByCode(id);
+
+      if (!<%= props.name %>) {
+        throw new NotFound<%= props.nameCapitalize %>Exception(`<%= props.name %> with id: ${id} not found!`);
+      }
+
+      return <%= props.name %>;
+    } catch (error) {
+      if (error instanceof NotFound<%= props.nameCapitalize %>Exception) {
+        throw error;
+      }
+
+      throw new Get<%= props.nameCapitalize %>Exception(`Erro when try to get a <%= props.name %> by id: ${id}`);
+    }
+  }
+}

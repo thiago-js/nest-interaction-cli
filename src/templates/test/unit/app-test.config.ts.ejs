@@ -1,0 +1,23 @@
+import { ConfigModule } from "@nestjs/config";
+
+const environmentsReadOnly = () => ({
+  DATABASE: {
+    IS_READ_ONLY: true,
+    URL: `url_base`,
+  },
+});
+
+const environmentsReadWrite = () => ({
+  DATABASE: {
+    IS_READ_ONLY: false,
+    URL: `url_base`,
+  },
+});
+
+export const configReadOnlyModule = ConfigModule.forRoot({
+  load: [environmentsReadOnly],
+});
+
+export const configReadWriteModule = ConfigModule.forRoot({
+  load: [environmentsReadWrite],
+});

@@ -1,0 +1,10 @@
+import { BadRequestException, HttpStatus } from "@nestjs/common";
+
+export class OpenTelemetryException extends BadRequestException {
+  constructor(message: any) {
+    super({
+      statusCode: HttpStatus.BAD_REQUEST,
+      message,
+    });
+  }
+}

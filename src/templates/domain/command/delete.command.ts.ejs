@@ -1,0 +1,40 @@
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+import { Delete<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/delete-<%= props.name %>.exception";
+import { I<%= props.nameCapitalize %>Repository } from "@/domain/repository/<%= props.name %>-repository.interface";
+import { ILogger } from "@/infra/logger/logger.client";
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
+export abstract class IDelete<%= props.nameCapitalize %>Command {
+  abstract execute(<%= props.name %>Uid: string): Promise<<%= props.nameCapitalize %>Entity>;
+}
+
+@Injectable()
+export class Delete<%= props.nameCapitalize %>CommandHandler implements IDelete<%= props.nameCapitalize %>Command {
+  constructor(
+    private readonly _<%= props.name %>Repository: I<%= props.nameCapitalize %>Repository,
+    private readonly _logger: ILogger
+  ) {}
+
+  async execute(<%= props.name %>Uid: string): Promise<<%= props.nameCapitalize %>Entity> {
+    this._logger.log(`Delete<%= props.nameCapitalize %>CommandHandler -> <%= props.name %>Uid: ${<%= props.name %>Uid}`);
+
+    try {
+      const <%= props.name %> = await this._<%= props.name %>Repository.delete(<%= props.name %>Uid);
+
+      this._logger.log(
+        `Delete<%= props.nameCapitalize %>CommandHandler -> <%= props.name %> deleted: ${JSON.stringify(
+          <%= props.name %>
+        )}`
+      );
+
+      return <%= props.name %>;
+    } catch (error) {
+      this._logger.log(`Delete<%= props.nameCapitalize %>CommandHandler -> error: ${error.message}`);
+
+      throw new Delete<%= props.nameCapitalize %>Exception(
+        `Erro when try to delete a <%= props.name %> with uid: ${<%= props.name %>Uid}`
+      );
+    }
+  }
+}

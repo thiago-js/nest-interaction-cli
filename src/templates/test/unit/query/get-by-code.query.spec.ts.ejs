@@ -1,0 +1,75 @@
+import { v4 } from "uuid";
+import { Test, TestingModule } from "@nestjs/testing";
+import { AppTestROModule } from "@/test/unit/app-test-RO.module";
+import { ILogger } from "@/infra/logger/logger.client";
+import { IGet<%= props.nameCapitalize %>ByCodeQuery } from "@/domain/query/get-<%= props.name %>-by-code.query";
+import { I<%= props.nameCapitalize %>Repository } from "@/domain/repository/<%= props.name %>-repository.interface";
+import { <%= props.nameCapitalize %>Fixture } from "@/test/unit/fixture/<%= props.name %>.fixture";
+import { NotFound<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/not-found-<%= props.name %>.exception";
+import { Get<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/get-<%= props.name %>.exception";
+
+describe("Get<%= props.nameCapitalize %>ByCodeQuery", () => {
+  let sut: IGet<%= props.nameCapitalize %>ByCodeQuery;
+  let <%= props.name %>Repository = {
+    getByCode: jest.fn(),
+  };
+
+  let <%= props.name %>Param = 1;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppTestROModule],
+    })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .overrideProvider(I<%= props.nameCapitalize %>Repository)
+      .useValue(<%= props.name %>Repository)
+      .compile();
+
+    sut = module.get<IGet<%= props.nameCapitalize %>ByCodeQuery>(IGet<%= props.nameCapitalize %>ByCodeQuery);
+  });
+
+  it("should be defined", () => {
+    expect(sut).toBeDefined();
+  });
+
+  it("should get a <%= props.name %> by code", async () => {
+    const expected<%= props.nameCapitalize %> = {
+      <%= props.name %>Uid: v4(),
+      ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+    };
+
+    <%= props.name %>Repository.getByCode.mockResolvedValue(expected<%= props.nameCapitalize %>);
+
+    const result = await sut.execute(<%= props.name %>Param);
+
+    expect(result).toEqual({
+      ...expected<%= props.nameCapitalize %>,
+    });
+
+    expect(<%= props.name %>Repository.getByCode).toHaveBeenCalled();
+    expect(<%= props.name %>Repository.getByCode).toHaveBeenCalledWith(<%= props.name %>Param);
+  });
+
+  it("should return exception NotFound<%= props.nameCapitalize %>Exception when <%= props.name %> not found", async () => {
+    <%= props.name %>Repository.getByCode.mockResolvedValue(undefined);
+
+    await expect(sut.execute(<%= props.name %>Param)).rejects.toThrow(NotFound<%= props.nameCapitalize %>Exception);
+
+    expect(<%= props.name %>Repository.getByCode).toHaveBeenCalled();
+    expect(<%= props.name %>Repository.getByCode).toHaveBeenCalledWith(<%= props.name %>Param);
+  });
+
+  it("should throw Get<%= props.nameCapitalize %>Exception when an error occurs", async () => {
+    <%= props.name %>Repository.getByCode.mockResolvedValue(undefined);
+
+    <%= props.name %>Repository.getByCode.mockRejectedValue(new Error());
+
+    await expect(sut.execute(<%= props.name %>Param)).rejects.toThrow(Get<%= props.nameCapitalize %>Exception);
+
+    expect(<%= props.name %>Repository.getByCode).toHaveBeenCalled();
+    expect(<%= props.name %>Repository.getByCode).toHaveBeenCalledWith(<%= props.name %>Param);
+  });
+});

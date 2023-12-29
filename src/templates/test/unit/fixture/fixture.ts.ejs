@@ -1,0 +1,15 @@
+export class <%= props.nameCapitalize %>Fixture {
+  static get<%= props.nameCapitalize %>Fixture() {
+    return {
+      <% props.properties.forEach(function(prop) { 
+         var typeLower = prop.type.toLowerCase(); %>
+        <%= prop.nameCamelCase %>: <% 
+            if (prop.nameCamelCase.toLowerCase().includes('uid')) { %>'1051f841-c20a-43ae-9883-eb0329047e30'<% } 
+            else if (typeLower === 'string') { %>'description'<% } 
+            else if (typeLower === 'number') { %>0<% } 
+            else if (typeLower === 'boolean') { %>true<% } 
+            else { %>'<%= prop.type %>'<% } %>,
+      <% }); %>
+    } as any;
+  }
+}

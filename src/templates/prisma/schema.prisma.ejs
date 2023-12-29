@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+  binaryTargets = ["native", "linux-arm64-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+  schemas = ["cmm", "domains"]
+}
+
+model <%= props.name %>_ {
+  <% props.properties.forEach(function(prop) { %>
+  <%= prop.nameSnakeCase %> <%= prop.typePrisma %> <%= prop.isUnique ? '@unique' : '' %>
+  <% }); %>
+  
+  @@map("<%= props.name %>")
+  @@schema("domains")
+}

@@ -1,0 +1,4 @@
+role_uid: ?string
+role_id: number
+description: string
+country_company_uid: string

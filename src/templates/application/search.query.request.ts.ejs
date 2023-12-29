@@ -1,0 +1,17 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Expose, Type } from "class-transformer";
+import { IsOptional } from "class-validator";
+
+export class Search<%= props.nameCapitalize %>QueryRequest {
+<% props.proprierties.forEach(function(prop) { %>
+  @IsOptional()
+  @Expose({ name: '<%= prop.nameSnakeCase %>' })
+  @ApiProperty({
+    name: '<%= prop.nameSnakeCase %>',
+    type: '<%= prop.type.toLowerCase() %>',
+    description: '<%= prop.nameSnakeCase %> description',
+    required: false,
+  })
+  <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>
+<% }); %>
+}

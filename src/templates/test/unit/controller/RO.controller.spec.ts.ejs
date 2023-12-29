@@ -1,0 +1,85 @@
+import { Test, TestingModule } from "@nestjs/testing";
+import { instanceToPlain } from "class-transformer";
+import { ILogger } from "@/infra/logger/logger.client";
+import { AppTestROModule } from "@/test/unit/app-test-RO.module";
+import { <%= props.nameCapitalize %>Response } from "@/application/controllers/response/<%= props.name %>.response";
+import { ICreate<%= props.nameCapitalize %>Command } from "@/domain/command/create-<%= props.name %>.command";
+import { IDelete<%= props.nameCapitalize %>Command } from "@/domain/command/delete-<%= props.name %>.command";
+import { IUpdate<%= props.nameCapitalize %>Command } from "@/domain/command/update-<%= props.name %>.command";
+import { IGet<%= props.nameCapitalize %>ByIdQuery } from "@/domain/query/get-<%= props.name %>-by-id.query";
+import { IGet<%= props.nameCapitalize %>sByParamsQuery } from "@/domain/query/get-<%= props.name %>-by-params.query";
+import { <%= props.nameCapitalize %>Fixture } from "@/test/unit/fixture/<%= props.name %>.fixture";
+import { <%= props.nameCapitalize %>Controller } from "@/application/controllers/<%= props.name %>.controller";
+import { IGet<%= props.nameCapitalize %>ByCodeQuery } from '@/domain/query/get-<%= props.name %>-by-code.query'
+
+describe("<%= props.nameCapitalize %>Controller", () => {
+  let mock<%= props.nameCapitalize %>: any = {
+    ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+  };
+
+  let controller: <%= props.nameCapitalize %>Controller;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppTestROModule],
+    })
+      .overrideProvider(IGet<%= props.nameCapitalize %>ByIdQuery)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(mock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(IGet<%= props.nameCapitalize %>sByParamsQuery)
+      .useValue({
+        execute: jest.fn().mockResolvedValue([mock<%= props.nameCapitalize %>]),
+      })
+      .overrideProvider(IGet<%= props.nameCapitalize %>ByCodeQuery)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(mock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(ICreate<%= props.nameCapitalize %>Command)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(mock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(IUpdate<%= props.nameCapitalize %>Command)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(mock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(IDelete<%= props.nameCapitalize %>Command)
+      .useValue({
+        execute: jest.fn(),
+      })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .compile();
+
+    controller = module.get<<%= props.nameCapitalize %>Controller>(<%= props.nameCapitalize %>Controller);
+  });
+
+  it("should be defined", () => {
+    expect(controller).toBeDefined();
+  });
+
+  it("should get a <%= props.name %> by id", async () => {
+    const result = await controller.get<%= props.nameCapitalize %>ById(mock<%= props.nameCapitalize %>.<%= props.name %>Uid);
+    expect(result.body).toEqual(
+      instanceToPlain(<%= props.nameCapitalize %>Response.toResponse(mock<%= props.nameCapitalize %>))
+    );
+  });
+
+  it("should get a <%= props.name %> by code", async () => {
+    const result = await controller.get<%= props.nameCapitalize %>ByCode(mock<%= props.nameCapitalize %>.<%= props.name %>);
+    
+    expect(result.body).toEqual(
+      instanceToPlain(<%= props.nameCapitalize %>Response.toResponse(mock<%= props.nameCapitalize %>))
+    );
+  });
+
+  it("should get countries by parameters", async () => {
+    const result = await controller.get<%= props.nameCapitalize %>(mock<%= props.nameCapitalize %>);
+
+    expect(result.body).toEqual([
+      instanceToPlain(<%= props.nameCapitalize %>Response.toResponse(mock<%= props.nameCapitalize %>)),
+    ]);
+  });
+});

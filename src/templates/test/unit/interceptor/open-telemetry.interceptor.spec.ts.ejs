@@ -1,0 +1,98 @@
+import { OpenTelemetryException } from "@/domain/exceptions/open-telemetry.exception";
+import { OpenTelemetryInterceptor } from "@/domain/interceptor/open-telemetry.interceptor";
+import { ExecutionContext, CallHandler } from "@nestjs/common";
+import { Observable, of } from "rxjs";
+
+describe("OpenTelemetryInterceptor", () => {
+  let interceptor: OpenTelemetryInterceptor;
+  let loggerMock: any;
+  let contextMock: any;
+  let callHandlerMock: any;
+  let requestMock: any;
+  let responseMock: any;
+
+  beforeEach(() => {
+    loggerMock = {
+      log: jest.fn(),
+      error: jest.fn(),
+    };
+
+    requestMock = {
+      body: {},
+      headers: {},
+    };
+
+    responseMock = {
+      statusCode: 200,
+    };
+
+    contextMock = {
+      switchToHttp: jest.fn().mockReturnValue({
+        getRequest: () => requestMock,
+        getResponse: () => responseMock,
+      }),
+    };
+
+    callHandlerMock = {
+      handle: jest.fn().mockReturnValue(of("test data")),
+    };
+
+    interceptor = new OpenTelemetryInterceptor(loggerMock);
+  });
+
+  it("should log telemetry data", (done) => {
+    interceptor
+      .intercept(
+        contextMock as ExecutionContext,
+        callHandlerMock as CallHandler
+      )
+      .subscribe(() => {
+        expect(loggerMock.log).toHaveBeenCalledWith(expect.any(String));
+        done();
+      });
+  });
+
+  it("should throw OpenTelemetryException when return response", (done) => {
+    callHandlerMock.handle = jest.fn().mockReturnValue(
+      new Observable((subscriber) => {
+        subscriber.error(new OpenTelemetryException("test error"));
+      })
+    );
+
+    interceptor
+      .intercept(
+        contextMock as ExecutionContext,
+        callHandlerMock as CallHandler
+      )
+      .subscribe({
+        next: () => {},
+        error: (err) => {
+          expect(err).toBeInstanceOf(OpenTelemetryException);
+          expect(err.message).toEqual("test error");
+          done();
+        },
+        complete: () => {},
+      });
+  });
+
+  it("should throw OpenTelemetryException execute intercept method", () => {
+    const contextMock: ExecutionContext = {
+      switchToHttp: () => ({
+        getRequest: () => {
+          throw new Error("getRequest failed");
+        },
+        getResponse: jest.fn(),
+      }),
+    } as unknown as ExecutionContext;
+
+    const callHandlerMock: CallHandler = {
+      handle: () => of({}),
+    };
+
+    expect(() => {
+      interceptor.intercept(contextMock, callHandlerMock).subscribe();
+    }).toThrow(OpenTelemetryException);
+
+    expect(loggerMock.error).toHaveBeenCalledWith(expect.any(String));
+  });
+});

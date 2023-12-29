@@ -1,0 +1,42 @@
+import { Injectable } from "@nestjs/common";
+import { ILogger } from "@/infra/logger/logger.client";
+import {
+  I<%= props.nameCapitalize %>Repository,
+  <%= props.nameCapitalize %>Params,
+} from "@/domain/repository/<%= props.name %>-repository.interface";
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+import { Create<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/create-<%= props.name %>.exception";
+
+@Injectable()
+export abstract class ICreate<%= props.nameCapitalize %>Command {
+  abstract execute(params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity>;
+}
+
+@Injectable()
+export class Create<%= props.nameCapitalize %>CommandHandler implements ICreate<%= props.nameCapitalize %>Command {
+  constructor(
+    private readonly _<%= props.name %>Repository: I<%= props.nameCapitalize %>Repository,
+    private readonly _logger: ILogger
+  ) {}
+
+  async execute(params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity> {
+    this._logger.log(
+      `Create<%= props.nameCapitalize %>CommandHandler -> params: ${JSON.stringify(params)}`
+    );
+
+    try {
+      const <%= props.name %> = await this._<%= props.name %>Repository.create(params);
+
+      this._logger.log(
+        `Create<%= props.nameCapitalize %>CommandHandler -> <%= props.name %> created: ${JSON.stringify(
+          <%= props.name %>
+        )}`
+      );
+
+      return <%= props.name %>;
+    } catch (error) {
+      this._logger.log(`Create<%= props.nameCapitalize %>CommandHandler -> error: ${error.message}`);
+      throw new Create<%= props.nameCapitalize %>Exception("Error when try to create a <%= props.name %>");
+    }
+  }
+}

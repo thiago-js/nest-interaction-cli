@@ -1,0 +1,77 @@
+import { v4 } from "uuid";
+import { Test, TestingModule } from "@nestjs/testing";
+import { AppTestROModule } from "@/test/unit/app-test-RO.module";
+import { ILogger } from "@/infra/logger/logger.client";
+import { Get<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/get-<%= props.name %>.exception";
+import { IGet<%= props.nameCapitalize %>sByParamsQuery } from "@/domain/query/get-<%= props.name %>-by-params.query";
+import { I<%= props.nameCapitalize %>Repository } from "@/domain/repository/<%= props.name %>-repository.interface";
+import { <%= props.nameCapitalize %>Fixture } from "@/test/unit/fixture/<%= props.name %>.fixture";
+
+describe("IGet<%= props.nameCapitalize %>sByParamsQuery", () => {
+  let sut: IGet<%= props.nameCapitalize %>sByParamsQuery;
+  let <%= props.name %>Repository = {
+    getByParams: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppTestROModule],
+    })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .overrideProvider(I<%= props.nameCapitalize %>Repository)
+      .useValue(<%= props.name %>Repository)
+      .compile();
+
+    sut = module.get<IGet<%= props.nameCapitalize %>sByParamsQuery>(IGet<%= props.nameCapitalize %>sByParamsQuery);
+  });
+
+  it("should be defined", () => {
+    expect(sut).toBeDefined();
+  });
+
+  it("should get <%= props.name %> by params", async () => {
+    const expectedCountry = {
+      <%= props.name %>Uid: v4(),
+      ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+    };
+
+    <%= props.name %>Repository.getByParams.mockResolvedValue([
+      expectedCountry,
+      expectedCountry,
+      expectedCountry,
+      expectedCountry,
+    ]);
+
+    const result = await sut.execute(<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture());
+
+    expect(result).toEqual([
+      expectedCountry,
+      expectedCountry,
+      expectedCountry,
+      expectedCountry,
+    ]);
+
+    expect(<%= props.name %>Repository.getByParams).toHaveBeenCalled();
+    expect(<%= props.name %>Repository.getByParams).toHaveBeenCalledWith(
+      <%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture()
+    );
+  });
+
+  it("should throw GetCountryException when an error occurs", async () => {
+    <%= props.name %>Repository.getByParams.mockRejectedValue(
+      new Get<%= props.nameCapitalize %>Exception("Error getting <%= props.name %> by params")
+    );
+
+    await expect(
+      sut.execute(<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture())
+    ).rejects.toThrow(Get<%= props.nameCapitalize %>Exception);
+
+    expect(<%= props.name %>Repository.getByParams).toHaveBeenCalled();
+    expect(<%= props.name %>Repository.getByParams).toHaveBeenCalledWith(
+      <%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture()
+    );
+  });
+});

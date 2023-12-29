@@ -1,0 +1,59 @@
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+import { UpdateMinimalRequirementsException } from "@/domain/exceptions/update-minimal-requirements.exception";
+import { Update<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/update-<%= props.name %>.exception";
+import {
+  I<%= props.nameCapitalize %>Repository,
+  <%= props.nameCapitalize %>Params,
+} from "@/domain/repository/<%= props.name %>-repository.interface";
+
+import { ILogger } from "@/infra/logger/logger.client";
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
+export abstract class IUpdate<%= props.nameCapitalize %>Command {
+  abstract execute(<%= props.name %>Uid: string, params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity>;
+}
+
+@Injectable()
+export class Update<%= props.nameCapitalize %>CommandHandler implements IUpdate<%= props.nameCapitalize %>Command {
+  constructor(
+    private readonly _<%= props.name %>Repository: I<%= props.nameCapitalize %>Repository,
+    private readonly _logger: ILogger
+  ) {}
+
+  async execute(<%= props.name %>Uid: string, params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity> {
+    this._logger.log(
+      `Update<%= props.nameCapitalize %>CommandHandler -> roleUid: ${<%= props.name %>Uid}, params: ${JSON.stringify(
+        params
+      )}`
+    );
+
+    try {
+      if (!this.isValidParam(params)) {
+        throw new UpdateMinimalRequirementsException(
+          "At least one field must be filled"
+        );
+      }
+
+      const <%= props.name %> = await this._<%= props.name %>Repository.update(<%= props.name %>Uid, params);
+
+      this._logger.log(
+        `Update<%= props.nameCapitalize %>CommandHandler -> <%= props.name %> updated: ${JSON.stringify(<%= props.name %>)}`
+      );
+
+      return <%= props.name %>;
+    } catch (error) {
+      if (error instanceof UpdateMinimalRequirementsException) {
+        throw error;
+      }
+
+      throw new Update<%= props.nameCapitalize %>Exception("Error when try to update <%= props.name %>");
+    }
+  }
+
+  private isValidParam(object: any): boolean {
+    return Object.values(object).some((value) => {
+      return value !== null && value !== undefined && value !== "";
+    });
+  }
+}

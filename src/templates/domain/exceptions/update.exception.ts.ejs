@@ -1,0 +1,10 @@
+import { BadRequestException, HttpStatus } from "@nestjs/common";
+
+export class Update<%= props.nameCapitalize %>Exception extends BadRequestException {
+  constructor(message: any) {
+    super({
+      statusCode: HttpStatus.BAD_REQUEST,
+      message,
+    });
+  }
+}

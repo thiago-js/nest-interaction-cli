@@ -1,0 +1,119 @@
+import { PrismaAdapter } from "@/infra/prisma/adapter/prisma.adapter";
+import { Injectable } from "@nestjs/common";
+import { v4 as uuid } from "uuid";
+import { <%= props.name %>_ } from "@prisma/client";
+
+import {
+  I<%= props.nameCapitalize %>Repository,
+  <%= props.nameCapitalize %>Params,
+} from "@/domain/repository/<%= props.name %>-repository.interface";
+
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+
+@Injectable()
+export class <%= props.nameCapitalize %>Repository implements I<%= props.nameCapitalize %>Repository {
+  constructor(private readonly prisma: PrismaAdapter) {}
+
+  async getById(id: string): Promise<<%= props.nameCapitalize %>Entity | null> {
+    const _<%= props.name %> = await this.prisma.<%= props.name %>_.findFirst({
+      where: {
+        <%= props.name %>_uid: id,
+      },
+    });
+
+    return this.mapper(_<%= props.name %>);
+  }
+
+  async getByCode(id: number): Promise<<%= props.nameCapitalize %>Entity | null> {
+    const _<%= props.name %> = await this.prisma.<%= props.name %>_.findFirst({
+      where: {
+        <%= props.name %>_id: id,
+      },
+    });
+
+    return this.mapper(_<%= props.name %>);
+  }
+
+  async getByParams(params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity[]> {
+    const <%= props.name %>s = await this.prisma.<%= props.name %>_.findMany({
+      where: {
+        ...this.mounthParams(params),
+      },
+    });
+
+    return <%= props.name %>s.map((<%= props.name %>) => this.mapper(<%= props.name %>));
+  }
+
+  async create(params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity> {
+    const _<%= props.name %> = await this.prisma.<%= props.name %>_.create({
+      data: {
+        <%= props.name %>_uid: uuid(),
+        ...this.mounthParams(params),
+      },
+    });
+
+    return this.mapper(_<%= props.name %>);
+  }
+
+  async update(
+    <%= props.name %>Uid: string,
+    params: <%= props.nameCapitalize %>Params
+  ): Promise<<%= props.nameCapitalize %>Entity | null> {
+    const _<%= props.name %> = await this.prisma.<%= props.name %>_.update({
+      where: {
+        <%= props.name %>_uid: <%= props.name %>Uid,
+      },
+      data: this.mounthParams(params),
+    });
+
+    return this.mapper(_<%= props.name %>);
+  }
+
+  async delete(<%= props.name %>Uid: string): Promise<<%= props.nameCapitalize %>Entity> {
+    const _<%= props.name %> = await this.prisma.<%= props.name %>_.delete({
+      where: {
+        <%= props.name %>_uid: <%= props.name %>Uid,
+      },
+    });
+
+    return this.mapper(_<%= props.name %>);
+  }
+
+  private mounthParams(params: <%= props.nameCapitalize %>Params): any {
+    Object.keys(params).forEach((key) => {
+      if (params[key] === undefined) {
+        delete params[key];
+      }
+
+      if (typeof params[key] === "number" && isNaN(params[key])) {
+        delete params[key];
+      }
+    });
+
+    return this.toSnackCase(params);
+  }
+
+  private toSnackCase(obj: Record<string, any>): Record<string, any> {
+    const newObj: Record<string, any> = {};
+
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const newKey = key.replace(
+          /([A-Z])/g,
+          (letter) => `_${letter.toLowerCase()}`
+        );
+        newObj[newKey] = obj[key];
+      }
+    }
+
+    return newObj;
+  }
+
+  private mapper(_<%= props.name %>: <%= props.name %>_): <%= props.nameCapitalize %>Entity {
+    return new <%= props.nameCapitalize %>Entity({
+        <% props.proprierties.forEach(function(prop) { %>
+          <%= prop.nameCamelCase %>: _<%= props.name %>.<%= prop.nameSnakeCase %>,
+        <% }); %>
+    });
+  }
+}

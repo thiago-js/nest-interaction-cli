@@ -1,0 +1,45 @@
+import { Entity } from "@/domain/entities/entity";
+
+export type <%= props.nameCapitalize %>Props = {
+  <% props.proprierties.forEach(function(prop) { %>
+    <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>;
+  <% }); %>
+};
+
+export type <%= props.nameCapitalize %>PlainProps = {
+  <% props.proprierties.forEach(function(prop) { %>
+    <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>;
+  <% }); %>
+};
+
+export class <%= props.nameCapitalize %>Entity extends Entity<<%= props.nameCapitalize %>Entity, <%= props.nameCapitalize %>Props, <%= props.nameCapitalize %>PlainProps> {
+  constructor(props: <%= props.nameCapitalize %>PlainProps) {
+    super(props);
+  }
+
+  <% props.proprierties.forEach(function(prop) { %>
+    get<%= prop.nameCamelCase %>(): <%= prop.type.toLowerCase() %> {
+      return this.props.<%= prop.nameCamelCase %>;
+    }
+  <% }); %>
+
+  deserialize(object: <%= props.nameCapitalize %>PlainProps): <%= props.nameCapitalize %>Entity {
+    return <%= props.nameCapitalize %>Entity.deserialize(object);
+  }
+
+  static deserialize(object: <%= props.nameCapitalize %>PlainProps): <%= props.nameCapitalize %>Entity {
+    return new <%= props.nameCapitalize %>Entity({
+      <% props.proprierties.forEach(function(prop) { %>
+        <%= prop.nameCamelCase %>: object.<%= prop.nameCamelCase %>,
+      <% }); %>
+    });
+  }
+
+  serialize(): <%= props.nameCapitalize %>PlainProps {
+    return {
+      <% props.proprierties.forEach(function(prop) { %>
+        <%= prop.nameCamelCase %>: this.props.<%= prop.nameCamelCase %>,
+      <% }); %>
+    };
+  }
+}

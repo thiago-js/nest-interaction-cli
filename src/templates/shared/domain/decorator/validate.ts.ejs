@@ -1,0 +1,37 @@
+/* eslint-disable func-names */
+import { validate } from "class-validator";
+import { BadRequestException, HttpStatus } from "@nestjs/common";
+
+export function Validation<T>(type: { new (): T }) {
+  return function (
+    _target: any,
+    _propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = async function (...args: any[]) {
+      for (const element of args) {
+        if (element instanceof type) {
+          await validateModel(element);
+        }
+      }
+
+      return originalMethod.apply(this, args);
+    };
+  };
+}
+
+export const validateModel = async (model) => {
+  const validation = await validate(model);
+
+  if (validation.length > 0) {
+    const errors = validation.map((error) => error.constraints);
+    const messages = errors.map((error) => error);
+
+    throw new BadRequestException({
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: messages,
+    });
+  }
+};

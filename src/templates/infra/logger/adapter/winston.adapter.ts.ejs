@@ -1,0 +1,47 @@
+import { ILogger } from "@/infra/logger/logger.client";
+import { Injectable, Scope } from "@nestjs/common";
+import { v4 as uuid } from "uuid";
+import * as winston from "winston";
+
+@Injectable({ scope: Scope.REQUEST })
+export class WinstonLoggerAdapter implements ILogger {
+  private readonly logger: winston.Logger;
+
+  constructor() {
+    this.logger = winston.createLogger({
+      level: "info",
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      ),
+      defaultMeta: {
+        service: "country-service",
+        correlationId: this._correlationId(),
+      },
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple()
+          ),
+        }),
+      ],
+    });
+  }
+
+  log(message: string, context?: string) {
+    this.logger.info(message, { context, message });
+  }
+
+  error(message: string, trace?: string, context?: string) {
+    this.logger.error(message, { trace, context });
+  }
+
+  warn(message: string, context?: string) {
+    this.logger.warn(message, { context });
+  }
+
+  private _correlationId(): string {
+    return uuid();
+  }
+}

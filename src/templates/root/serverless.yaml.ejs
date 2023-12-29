@@ -1,0 +1,63 @@
+service: <%= props.name %>
+
+frameworkVersion: "3"
+
+package:
+  individually: true
+  patterns:
+    - "node_modules/.prisma/client/libquery_engine-rhel-*"
+    - "!node_modules/.prisma/client/libquery_engine-*"
+    - "!node_modules/prisma/libquery_engine-*"
+    - "!node_modules/@prisma/engines/**"
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-webpack
+  - serverless-webpack-prisma
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: stage
+  memorySize: 1024
+  timeout: 29
+  environment:
+    SLS_DEBUG: "*"
+    STAGE: ${env:STAGE}
+  apiName: ${env:STAGE}-<%= props.name %>-api
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sns:*
+        - kms:*
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetSecretValue
+        - secretsmanager:ListSecrets
+      Resource: "*"
+  iamManagedPolicies:
+    - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+
+configValidationMode: error
+
+custom:
+  webpack:
+    webpackConfig: "webpack.config.js"
+    includeModules: true
+    packagerOptions:
+      scripts:
+        - prisma generate
+
+functions:
+  main:
+    handler: src/handlers/api/handler.handler
+    timeout: 30
+    events:
+      - http:
+          cors: true
+          method: ANY
+          path: "/{proxy+}"

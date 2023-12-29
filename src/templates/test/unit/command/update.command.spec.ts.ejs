@@ -1,0 +1,93 @@
+import { Test, TestingModule } from '@nestjs/testing'
+
+import { AppTestRWModule } from '@/test/unit/app-test-RW.module'
+import { ILogger } from '@/infra/logger/logger.client'
+import { v4 } from 'uuid'
+import { IUpdate<%= props.nameCapitalize %>Command } from '@/domain/command/update-<%= props.name %>.command'
+import { UpdateMinimalRequirementsException } from '@/domain/exceptions/update-minimal-requirements.exception'
+import { Update<%= props.nameCapitalize %>Exception } from '@/domain/exceptions/update-role.exception'
+import {
+  I<%= props.nameCapitalize %>Repository,
+  <%= props.nameCapitalize %>Params,
+} from '@/domain/repository/<%= props.name %>-repository.interface'
+import { <%= props.nameCapitalize %>Fixture } from '@/test/unit/fixture/<%= props.name %>.fixture'
+
+describe('Update<%= props.nameCapitalize %>Command', () => {
+  let sut: IUpdate<%= props.nameCapitalize %>Command
+  const roleRepository = {
+    update: jest.fn(),
+  }
+
+  const mock<%= props.nameCapitalize %> = {
+    ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+  }
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppTestRWModule],
+    })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .overrideProvider(I<%= props.nameCapitalize %>Repository)
+      .useValue(roleRepository)
+      .compile()
+
+    sut = module.get<IUpdate<%= props.nameCapitalize %>Command>(IUpdate<%= props.nameCapitalize %>Command)
+  })
+
+  it('should be defined', () => {
+    expect(sut).toBeDefined()
+  })
+
+  it('should update a <%= props.name %> by id', async () => {
+    const <%= props.name %>Uid = v4()
+    const <%= props.name %>Params: <%= props.nameCapitalize %>Params = {
+      ...mock<%= props.nameCapitalize %>,
+    }
+
+    const expected<%= props.nameCapitalize %> = {
+      <%= props.name %>Uid,
+      mock<%= props.nameCapitalize %>,
+    }
+
+    roleRepository.update.mockResolvedValue(expected<%= props.nameCapitalize %>)
+
+    const result = await sut.execute(<%= props.name %>Uid, <%= props.name %>Params)
+
+    expect(result).toEqual({
+      ...expected<%= props.nameCapitalize %>,
+    })
+
+    expect(roleRepository.update).toHaveBeenCalled()
+    expect(roleRepository.update).toHaveBeenCalledWith(
+      <%= props.name %>Uid,
+      <%= props.name %>Params
+    )
+  })
+
+  it('should throw exception Update<%= props.nameCapitalize %>Exception when not updated on database', async () => {
+    const <%= props.name %>Uid = v4()
+    const <%= props.name %>Params: <%= props.nameCapitalize %>Params = {
+      ...mock<%= props.nameCapitalize %>,
+    }
+
+    roleRepository.update.mockRejectedValue(
+      new Update<%= props.nameCapitalize %>Exception('Error when try to update <%= props.name %>')
+    )
+
+    await expect(sut.execute(<%= props.name %>Uid, <%= props.name %>Params)).rejects.toThrow(
+      Update<%= props.nameCapitalize %>Exception
+    )
+  })
+
+  it('should throw exception UpdateMinimalRequirementsException when not pass minimal requirements params', async () => {
+    const <%= props.name %>Uid = v4()
+    const <%= props.name %>Params: any = {}
+
+    await expect(sut.execute(<%= props.name %>Uid, <%= props.name %>Params)).rejects.toThrow(
+      UpdateMinimalRequirementsException
+    )
+  })
+})

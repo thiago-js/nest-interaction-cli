@@ -1,0 +1,17 @@
+import { Injectable } from '@nestjs/common'
+
+export interface <%= props.nameCapitalize %>Params {
+  <% props.proprierties.forEach(function(prop) { %>
+  <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>
+  <% }); %>
+}
+
+@Injectable()
+export abstract class I<%= props.nameCapitalize %>Repository {
+  abstract getById(id: string): Promise<any | null>
+  abstract getByCode(id: number): Promise<any | null>
+  abstract getByParams(params: <%= props.nameCapitalize %>Params): Promise<any[] | null>
+  abstract create(params: <%= props.nameCapitalize %>Params): Promise<any>
+  abstract update(<%= props.name %>Uid: string, params: <%= props.nameCapitalize %>Params): Promise<any>
+  abstract delete(<%= props.name %>Uid: string): Promise<any>
+}

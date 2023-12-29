@@ -1,0 +1,191 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseInterceptors,
+} from "@nestjs/common";
+
+import { BadRequest, HttpResponse, OkRequest } from "@/shared/domain/helpers";
+
+import { ApiResponse } from "@nestjs/swagger";
+import { IGet<%= props.nameCapitalize %>ByIdQuery } from "@/domain/query/get-<%= props.name %>-by-id.query";
+import { <%= props.nameCapitalize %>Response } from "@/application/controllers/response/<%= props.name %>.response";
+import { Create<%= props.nameCapitalize %>BodyRequest } from "@/application/controllers/request/body/create-<%= props.name %>.body.request";
+import { ICreate<%= props.nameCapitalize %>Command } from "@/domain/command/create-<%= props.name %>.command";
+import { IUpdate<%= props.nameCapitalize %>Command } from "@/domain/command/update-<%= props.name %>.command";
+import { IDelete<%= props.nameCapitalize %>Command } from "@/domain/command/delete-<%= props.name %>.command";
+import { Update<%= props.nameCapitalize %>BodyRequest } from "@/application/controllers/request/body/update-<%= props.name %>.body.request";
+import { <%= props.nameCapitalize %>Params } from "@/domain/repository/<%= props.name %>-repository.interface";
+import { IGet<%= props.nameCapitalize %>sByParamsQuery } from "@/domain/query/get-<%= props.name %>-by-params.query";
+import { ILogger } from "@/infra/logger/logger.client";
+import { ConfigService } from "@nestjs/config";
+import { Search<%= props.nameCapitalize %>QueryRequest } from "@/application/controllers/request/query/search-<%= props.name %>.query.request";
+import { OpenTelemetryInterceptor } from "@/domain/interceptor/open-telemetry.interceptor";
+import { IGet<%= props.nameCapitalize %>ByCodeQuery } from "@/domain/query/get-<%= props.name %>-by-code.query";
+
+@Controller()
+@UseInterceptors(OpenTelemetryInterceptor)
+export class <%= props.nameCapitalize %>Controller {
+  isReadOnly = false;
+
+  constructor(
+    private readonly _<%= props.name %>ById: IGet<%= props.nameCapitalize %>ByIdQuery,
+    private readonly _<%= props.name %>ByCode: IGet<%= props.nameCapitalize %>ByCodeQuery,
+    private readonly _<%= props.name %>ByParams: IGet<%= props.nameCapitalize %>sByParamsQuery,
+    private readonly _create<%= props.nameCapitalize %>: ICreate<%= props.nameCapitalize %>Command,
+    private readonly _updated<%= props.nameCapitalize %>: IUpdate<%= props.nameCapitalize %>Command,
+    private readonly _delete<%= props.nameCapitalize %>: IDelete<%= props.nameCapitalize %>Command,
+    private readonly _logger: ILogger,
+    private readonly _configService: ConfigService
+  ) {
+    this.isReadOnly = this._configService.get<boolean>("DATABASE.IS_READ_ONLY");
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "search <%= props.nameCapitalize %> by query params",
+  })
+  @Get("search")
+  async get<%= props.nameCapitalize %>(
+    @Query() query: Search<%= props.nameCapitalize %>QueryRequest
+  ): Promise<HttpResponse> {
+    if (!this.isReadOnly) {
+      return this.badRequestOperation(this.isReadOnly);
+    }
+
+    this._logger.log(`get <%= props.nameCapitalize %> by params: ${JSON.stringify(query)}`);
+
+    const response = <%= props.nameCapitalize %>Response.toResponse(
+      await this._<%= props.name %>ByParams.execute(query as <%= props.nameCapitalize %>Params)
+    );
+
+    this._logger.log(
+      `countries by params response: ${JSON.stringify(response)}`
+    );
+
+    return OkRequest(response);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "return <%= props.name %>",
+  })
+  @Get(":id")
+  async get<%= props.nameCapitalize %>ById(@Param("id") id: string): Promise<HttpResponse> {
+    if (!this.isReadOnly) {
+      return this.badRequestOperation(this.isReadOnly);
+    }
+
+    this._logger.log(`get <%= props.name %> by id: ${id}`);
+
+    const response = <%= props.nameCapitalize %>Response.toResponse(
+      await this._<%= props.name %>ById.execute(id)
+    );
+
+    this._logger.log(
+      `<%= props.name %> by id ${id} response: ${JSON.stringify(response)}`
+    );
+
+    return OkRequest(response);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "return <%= props.name %>",
+  })
+  @Get("code/:code")
+  async get<%= props.nameCapitalize %>ByCode(@Param("code") code: number): Promise<HttpResponse> {
+    if (!this.isReadOnly) {
+      return this.badRequestOperation(this.isReadOnly);
+    }
+
+    this._logger.log(`get <%= props.name %> by code: ${code}`);
+
+    const response = <%= props.nameCapitalize %>Response.toResponse(
+      await this._<%= props.name %>ByCode.execute(code)
+    );
+
+    this._logger.log(
+      `<%= props.name %> by code ${code} response: ${JSON.stringify(response)}`
+    );
+
+    return OkRequest(response);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: "create <%= props.name %>",
+  })
+  @Post("create")
+  @HttpCode(HttpStatus.CREATED)
+  async create<%= props.nameCapitalize %>(
+    @Body() params: Create<%= props.nameCapitalize %>BodyRequest
+  ): Promise<HttpResponse> {
+    if (this.isReadOnly) {
+      return this.badRequestOperation(this.isReadOnly);
+    }
+
+    this._logger.log(`create <%= props.name %>: ${JSON.stringify(params)}`);
+
+    const response = <%= props.nameCapitalize %>Response.toResponse(
+      await this._create<%= props.nameCapitalize %>.execute(params as <%= props.nameCapitalize %>Params)
+    );
+
+    this._logger.log(`<%= props.name %> created response: ${JSON.stringify(response)}`);
+
+    return OkRequest(response);
+  }
+
+  @Put(":id")
+  async update<%= props.nameCapitalize %>(
+    @Param("id") @Param() id: string,
+    @Body() params: Update<%= props.nameCapitalize %>BodyRequest
+  ): Promise<HttpResponse> {
+    if (this.isReadOnly) {
+      return this.badRequestOperation(this.isReadOnly);
+    }
+
+    this._logger.log(`update <%= props.name %> by id ${id} : ${JSON.stringify(params)}`);
+
+    const response = <%= props.nameCapitalize %>Response.toResponse(
+      await this._updated<%= props.nameCapitalize %>.execute(id, params as <%= props.nameCapitalize %>Params)
+    );
+
+    this._logger.log(`<%= props.name %> updated response: ${JSON.stringify(response)}`);
+
+    return OkRequest(response);
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  async delete<%= props.nameCapitalize %>(@Param("id") @Param() id: string): Promise<HttpResponse> {
+    if (this.isReadOnly) {
+      return this.badRequestOperation(this.isReadOnly);
+    }
+
+    this._logger.log(`delete <%= props.name %> by id ${id}`);
+
+    const response = <%= props.nameCapitalize %>Response.toResponse(
+      await this._delete<%= props.nameCapitalize %>.execute(id)
+    );
+
+    this._logger.log(`<%= props.name %> deleted with success`);
+
+    return OkRequest(response);
+  }
+
+  private badRequestOperation(isReadOnly: boolean): any {
+    return BadRequest({
+      message: isReadOnly
+        ? "this operation is not allowed because the connection is read only"
+        : "this operation is not allowed because the connection is read write",
+    });
+  }
+}

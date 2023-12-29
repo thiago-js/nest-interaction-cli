@@ -1,0 +1,38 @@
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+import { Get<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/get-<%= props.name %>.exception";
+import {
+  <%= props.nameCapitalize %>Params,
+  I<%= props.nameCapitalize %>Repository,
+} from "@/domain/repository/<%= props.name %>-repository.interface";
+
+import { ILogger } from "@/infra/logger/logger.client";
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
+export abstract class IGet<%= props.nameCapitalize %>sByParamsQuery {
+  abstract execute(params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity[]>;
+}
+
+@Injectable()
+export class Get<%= props.nameCapitalize %>sByParamsQueryHandler implements IGet<%= props.nameCapitalize %>sByParamsQuery {
+  constructor(
+    private readonly _<%= props.name %>Repository: I<%= props.nameCapitalize %>Repository,
+    private readonly _logger: ILogger
+  ) {}
+
+  async execute(params: <%= props.nameCapitalize %>Params): Promise<<%= props.nameCapitalize %>Entity[]> {
+    this._logger.log(`get <%= props.name %> by params: ${JSON.stringify(params)}`);
+
+    try {
+      const <%= props.name %> = await this._<%= props.name %>Repository.getByParams(params);
+
+      this._logger.log(`<%= props.name %>: ${JSON.stringify(<%= props.name %>)}`);
+
+      return <%= props.name %>;
+    } catch (error) {
+      throw new Get<%= props.nameCapitalize %>Exception(
+        `Erro when try to get a <%= props.name %>s by params: ${JSON.stringify(params)}`
+      );
+    }
+  }
+}

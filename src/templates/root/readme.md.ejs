@@ -1,0 +1,139 @@
+# <%= props.nameCapitalize %>
+
+### Objetivo
+
+O propósito deste projeto é implementar e um CRUD para gerenciamento de países, utilizando o padrão CQRS.
+
+## Tecnologias Utilizadas no Projeto
+
+- [_nestjs_](https://nestjs.com/) com TypeScript: NestJS é um framework progressivo de Node.js para construir aplicações eficientes e confiáveis no lado do servidor. Usa JavaScript moderno, é construído com TypeScript e combina elementos de OOP (Programação Orientada a Objetos), FP (Programação Funcional) e FRP (Programação Funcional Reativa).
+
+- [_prisma_](https://www.prisma.io/): Prisma é um conjunto de ferramentas de banco de dados de código aberto. Ele substitui ORMs tradicionais e torna o acesso ao banco de dados fácil com um gerador de consultas automático para TypeScript & Node.js.
+
+- [_framework serverless_](https://www.serverless.com/): O Framework Serverless ajuda você a desenvolver e implantar suas aplicações serverless, de forma gratuita. É um conjunto de ferramentas para implantar aplicações serverless.
+
+## Estrutura do Projeto
+
+### Pontos Importantes da Arquitetura
+
+- **Estrutura DDD**: A arquitetura segue os princípios do Design Orientado ao Domínio, o que auxilia na concepção de soluções empresariais complexas ao conectar a implementação a um modelo em evolução.
+- **Desacoplamento**: Seguindo as melhores práticas e padrões de design, a base de código é altamente desacoplada, promovendo a reutilização do código e manutenção.
+- **Manutenibilidade**: O projeto é estruturado para ser facilmente compreensível e mantido por diferentes desenvolvedores.
+- **Integração Swagger**: A API é documentada e testada usando o Swagger, que fornece uma interface amigável para trabalhar com os recursos da API. Com o Swagger, os usuários podem entender as capacidades da API sem acessar seu código-fonte, facilitando a interação e experimentação.
+
+## Hierarquia de Arquivos
+
+```bash
+
+├── country
+│     ├── prisma
+│     │   └── schema.prisma
+│     └── src
+│         ├── context
+│         │   ├── application
+│         │   │   ├── controllers
+│         │   │   │   ├── country.controller.ts
+│         │   │   │   ├── request
+│         │   │   │   │   ├── create-country.body.request.ts
+│         │   │   │   │   └── update-country.body.request.ts
+│         │   │   │   └── response
+│         │   │   │       └── country.response.ts
+│         │   ├── domain
+│         │   │   ├── command
+│         │   │   │   ├── create-country.command.ts
+│         │   │   │   ├── delete-country.command.ts
+│         │   │   │   └── update-country.command.ts
+│         │   │   ├── entities
+│         │   │   │   ├── country.entity.ts
+│         │   │   │   ├── entity.ts
+│         │   │   │   └── index.ts
+│         │   │   ├── exceptions
+│         │   │   │   ├── create-country.exception.ts
+│         │   │   │   ├── delete-country.exception.ts
+│         │   │   │   ├── get-country.exception.ts
+│         │   │   │   ├── not-found-country.exception.ts
+│         │   │   │   └── update-minimal-requirements.exception.ts
+│         │   │   ├── query
+│         │   │   │   └── get-country-by-id.query.ts
+│         │   │   └── repository
+│         │   │       └── country-repository.interface.ts
+│         │   ├── infra
+│         │   │   ├── country
+│         │   │   │   └── repository
+│         │   │   │       └── country.repository.ts
+│         │   │   ├── http
+│         │   │   │   ├── adapter
+│         │   │   │   │   └── axios.adapter.ts
+│         │   │   │   └── http.client.ts
+│         │   │   └── prisma
+│         │   │       └── adapter
+│         │   │           └── prisma.adapter.ts
+│         │   └── shared
+│         │       ├── domain
+│         │       │   ├── decorator
+│         │       │   │   ├── index.ts
+│         │       │   │   └── validate.ts
+│         │       │   └── helpers
+│         │       │       ├── http.ts
+│         │       │       └── index.ts
+│         ├── handlers
+│         │   └── api
+│         │       ├── app.module.ts
+│         │       └── handler.ts
+
+```
+
+### Instalando Dependências
+
+```bash
+> pnpm i
+```
+
+### Configuração do Ambiente
+
+```bash
+# Para STAGE
+STAGE=STAGE
+DATABASE_URL=STRING_DE_CONEXÃO_DO_BANCO
+```
+
+### Migração
+
+Agora que temos o ambiente configurado, precisamos criar uma migração para o nosso modelo no banco de dados.
+
+```bash
+# simplesmente execute o comando para gerar o cliente prisma a partir do seu modelo
+> pnpm run prisma:generate
+```
+
+```bash
+# depois disso, execute sua primeira migração no seu banco de dados; desta forma, o Prisma pegará seu esquema, converterá em um script de banco de dados e aplicará
+> npx prisma migrate dev --name nome_da_migração
+```
+
+Com isso, temos o cliente Prisma configurado no projeto e a estrutura criada no banco de dados.
+
+### Executando a Aplicação com serverless-offline
+
+```bash
+ ## para o ambiente 'stage'
+> pnpm run off stage
+```
+
+### Criando Imagem Docker
+
+```bash
+ ## construindo a imagem 'país' com a aplicação funcional
+> docker build . -t country
+```
+
+### Executando o Container
+
+```bash
+ ## executando o container na porta 3000, passando as variáveis de ambiente configuradas em .env
+> docker run --env-file .env -p 3000:3000 country
+```
+
+_Nota: Todos os comandos são executados na pasta raiz do projeto._
+
+[voltar](../../readme.md)

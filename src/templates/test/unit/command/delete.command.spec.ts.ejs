@@ -1,0 +1,54 @@
+import { v4 } from "uuid";
+import { Test, TestingModule } from "@nestjs/testing";
+import { AppTestRWModule } from "@/test/unit/app-test-RW.module";
+import { ILogger } from "@/infra/logger/logger.client";
+import { IDelete<%= props.nameCapitalize %>Command } from "@/domain/command/delete-<%= props.name %>.command";
+import { Delete<%= props.nameCapitalize %>Exception } from "@/domain/exceptions/delete-<%= props.name %>.exception";
+import { I<%= props.nameCapitalize %>Repository } from "@/domain/repository/<%= props.name %>-repository.interface";
+
+describe("Delete<%= props.nameCapitalize %>Command", () => {
+  let sut: IDelete<%= props.nameCapitalize %>Command;
+  let <%= props.name %>Repository = {
+    delete: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppTestRWModule],
+    })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .overrideProvider(I<%= props.nameCapitalize %>Repository)
+      .useValue(<%= props.name %>Repository)
+      .compile();
+
+    sut = module.get<IDelete<%= props.nameCapitalize %>Command>(IDelete<%= props.nameCapitalize %>Command);
+  });
+
+  it("should be defined instance", () => {
+    expect(sut).toBeDefined();
+  });
+
+  it("should delete <%= props.name %> by id", async () => {
+    const <%= props.name %>Uid = v4();
+
+    await sut.execute(<%= props.name %>Uid);
+
+    expect(<%= props.name %>Repository.delete).toHaveBeenCalled();
+    expect(<%= props.name %>Repository.delete).toHaveBeenCalledWith(<%= props.name %>Uid);
+  });
+
+  it("should throw exception Delete<%= props.nameCapitalize %>Exception when not delete item", async () => {
+    const <%= props.name %>Uid = v4();
+
+    <%= props.name %>Repository.delete.mockRejectedValue(
+      new Delete<%= props.nameCapitalize %>Exception("Error to delete <%= props.name %>")
+    );
+
+    await expect(sut.execute(<%= props.name %>Uid)).rejects.toThrow(
+      Delete<%= props.nameCapitalize %>Exception
+    );
+  });
+});

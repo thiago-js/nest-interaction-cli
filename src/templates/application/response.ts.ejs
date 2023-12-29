@@ -1,0 +1,55 @@
+import { IsNumber, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+
+export type <%= props.nameCapitalize %>ResponseProps = {
+<% props.proprierties.forEach(function(prop) { %>
+    <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>;
+<% }); %>
+};
+
+export class <%= props.nameCapitalize %>Response {
+
+  <% props.proprierties.forEach(function(prop) { %>
+    @IsOptional()
+    @Expose({ name: '<%= prop.nameSnakeCase %>' })
+    @ApiProperty({
+      name: '<%= prop.nameSnakeCase %>',
+      type: '<%= prop.type.toLowerCase() %>',
+      description: '<%= prop.nameSnakeCase %> description',
+      required: false,
+    })
+    <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>
+  <% }); %>
+              
+  static toResponse(
+    role: <%= props.nameCapitalize %>Entity | <%= props.nameCapitalize %>Entity[]
+  ): <%= props.nameCapitalize %>Response | <%= props.nameCapitalize %>Response[] {
+    if (Array.isArray(role)) {
+      return role.map((item) => {
+        if (item instanceof <%= props.nameCapitalize %>Entity) {
+          return this.mapper(item.serialize());
+        }
+
+        return this.mapper(item);
+      });
+    }
+
+    if (role instanceof <%= props.nameCapitalize %>Entity) {
+      return this.mapper(role.serialize());
+    }
+
+    return this.mapper(role);
+  }
+
+  private static mapper(_<%= props.name %>: <%= props.nameCapitalize %>ResponseProps): <%= props.nameCapitalize %>Response {
+    const response = new <%= props.nameCapitalize %>Response();
+
+    <% props.proprierties.forEach(function(prop) { %>
+        response.<%= prop.nameCamelCase %> = _<%= props.name %>.<%= prop.nameCamelCase %>;
+    <% }); %>
+
+    return response;
+  }
+}

@@ -1,0 +1,128 @@
+import { v4 as uuidv4 } from "uuid";
+import { Test, TestingModule } from "@nestjs/testing";
+import { ILogger } from "@/infra/logger/logger.client";
+import { BadRequest } from "@/shared/domain/helpers";
+import { AppTestRWModule } from "@/test/unit/app-test-RW.module";
+import { AppTestROModule } from "@/test/unit/app-test-RO.module";
+import { Create<%= props.nameCapitalize %>BodyRequest } from "@/application/controllers/request/body/create-<%= props.name %>.body.request";
+import { <%= props.nameCapitalize %>Fixture } from "@/test/unit/fixture/<%= props.name %>.fixture";
+import { <%= props.nameCapitalize %>Controller } from "@/application/controllers/<%= props.name %>.controller";
+
+
+describe("<%= props.nameCapitalize %>Controller", () => {
+  let mock<%= props.nameCapitalize %>: any = {
+    ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+  };
+
+  let deleteMock<%= props.nameCapitalize %>: any = {
+    ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+    <%= props.name %>Uid: uuidv4(),
+  };
+
+  let controllerRO: <%= props.nameCapitalize %>Controller;
+  let controllerRW: <%= props.nameCapitalize %>Controller;
+
+  beforeEach(async () => {
+    const moduleRW: TestingModule = await Test.createTestingModule({
+      imports: [AppTestRWModule],
+    })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .compile();
+
+    const moduleRO: TestingModule = await Test.createTestingModule({
+      imports: [AppTestROModule],
+    })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .compile();
+
+    controllerRW = moduleRO.get<<%= props.nameCapitalize %>Controller>(<%= props.nameCapitalize %>Controller);
+    controllerRO = moduleRW.get<<%= props.nameCapitalize %>Controller>(<%= props.nameCapitalize %>Controller);
+  });
+
+  it("should be defined", () => {
+    expect(controllerRW).toBeDefined();
+    expect(controllerRO).toBeDefined();
+  });
+
+  it("Create<%= props.nameCapitalize %>: should return BadRequest when operation is not allowed", async () => {
+    const create: Create<%= props.nameCapitalize %>BodyRequest = {
+      ...mock<%= props.nameCapitalize %>,
+    };
+
+    const response = await controllerRW.create<%= props.nameCapitalize %>(create);
+
+    expect(response).toEqual(
+      BadRequest({
+        message:
+          "this operation is not allowed because the connection is read only",
+      })
+    );
+  });
+
+  it("update<%= props.nameCapitalize %>: should return BadRequest when operation is not allowed", async () => {
+    const update: Create<%= props.nameCapitalize %>BodyRequest = {
+      ...mock<%= props.nameCapitalize %>,
+    };
+
+    const id = "mockId";
+    const response = await controllerRW.update<%= props.nameCapitalize %>(id, update);
+
+    expect(response).toEqual(
+      BadRequest({
+        message:
+          "this operation is not allowed because the connection is read only",
+      })
+    );
+  });
+
+  it("delete<%= props.nameCapitalize %>: should return BadRequest when operation is not allowed", async () => {
+    const response = await controllerRW.delete<%= props.nameCapitalize %>(
+      deleteMock<%= props.nameCapitalize %>.<%= props.name %>Uid
+    );
+
+    expect(response).toEqual(
+      BadRequest({
+        message:
+          "this operation is not allowed because the connection is read only",
+      })
+    );
+  });
+
+  it("get<%= props.nameCapitalize %>ById: should return BadRequest when operation is not allowed", async () => {
+    const result = await controllerRO.get<%= props.nameCapitalize %>ById("mockId");
+    expect(result).toEqual(
+      BadRequest({
+        message:
+          "this operation is not allowed because the connection is read write",
+      })
+    );
+  });
+
+  it("get<%= props.nameCapitalize %>s: should return BadRequest when operation is not allowed", async () => {
+    const result = await controllerRO.get<%= props.nameCapitalize %>(mock<%= props.nameCapitalize %>);
+
+    expect(result).toEqual(
+      BadRequest({
+        message:
+          "this operation is not allowed because the connection is read write",
+      })
+    );
+  });
+
+  it('get<%= props.nameCapitalize %>ByCode: should return BadRequest when operation is not allowed', async () => {
+    const result = await controllerRO.get<%= props.nameCapitalize %>ByCode(1)
+  
+    expect(result).toEqual(
+      BadRequest({
+        message:
+          'this operation is not allowed because the connection is read write',
+      })
+    );
+  })
+});

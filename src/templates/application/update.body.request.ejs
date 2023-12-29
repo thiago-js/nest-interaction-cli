@@ -1,0 +1,9 @@
+import { Create<%= props.nameCapitalize %>BodyRequest } from "@/application/controllers/request/body/create-<%= props.name %>.body.request";
+import { IsOptional } from "class-validator";
+
+export class Update<%= props.nameCapitalize %>BodyRequest extends Create<%= props.nameCapitalize %>BodyRequest {
+    <% props.proprierties.forEach(function(prop) { %>
+    @IsOptional()
+    <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>;
+    <% }); %>
+}

@@ -1,0 +1,50 @@
+import { instanceToPlain } from "class-transformer";
+import HttpStatusCode from "status-code-enum";
+
+export interface HttpResponseHeader {
+  "Content-Type": string;
+}
+
+export type HttpRequestHeaders = Record<string, string | number | boolean>;
+
+export interface HttpResponse {
+  statusCode?: HttpStatusCode | undefined;
+  body?: any | undefined;
+}
+
+export const OkCreate = (): HttpResponse => ({
+  statusCode: HttpStatusCode.SuccessCreated,
+});
+
+export const UnprocessableEntity = (body?: any): HttpResponse => ({
+  statusCode: HttpStatusCode.ClientErrorUnprocessableEntity,
+  body: JSON.stringify(body),
+});
+
+export const OkRequest = (body?: unknown | null): HttpResponse => ({
+  statusCode: HttpStatusCode.SuccessOK,
+  body: body ? instanceToPlain(body) : body,
+});
+
+export const OkNoContent = (): HttpResponse => ({
+  statusCode: HttpStatusCode.SuccessNoContent,
+});
+
+export const NotFoundResult = (body?: any | null): HttpResponse => ({
+  statusCode: HttpStatusCode.ClientErrorNotFound,
+  body: body ? instanceToPlain(body) : body,
+});
+
+export const BadRequest = (body?: any | null): HttpResponse => ({
+  statusCode: HttpStatusCode.ClientErrorBadRequest,
+  body: body ? instanceToPlain(body) : body,
+});
+
+export const httpResponse = (body?: any | null): string => JSON.stringify(body);
+
+export const httpException = (error?: any | null): any => {
+  return {
+    statusCode: error.getResponse().statusCode,
+    body: JSON.stringify(error.getResponse()),
+  };
+};

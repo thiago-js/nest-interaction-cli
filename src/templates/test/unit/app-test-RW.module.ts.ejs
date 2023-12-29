@@ -1,0 +1,75 @@
+import { Module } from "@nestjs/common";
+import { PrismaAdapter } from "@/infra/prisma/adapter/prisma.adapter";
+
+import { ILogger } from "@/infra/logger/logger.client";
+import { WinstonLoggerAdapter } from "@/infra/logger/adapter/winston.adapter";
+import { configReadWriteModule } from "@/test/unit/app-test.config";
+import {
+  ICreate<%= props.nameCapitalize %>Command,
+  Create<%= props.nameCapitalize %>CommandHandler,
+} from "@/domain/command/create-<%= props.name %>.command";
+import {
+  IDelete<%= props.nameCapitalize %>Command,
+  Delete<%= props.nameCapitalize %>CommandHandler,
+} from "@/domain/command/delete-<%= props.name %>.command";
+import {
+  IUpdate<%= props.nameCapitalize %>Command,
+  Update<%= props.nameCapitalize %>CommandHandler,
+} from "@/domain/command/update-<%= props.name %>.command";
+import {
+  IGet<%= props.nameCapitalize %>ByIdQuery,
+  Get<%= props.nameCapitalize %>ByIdQueryHandler,
+} from "@/domain/query/get-<%= props.name %>-by-id.query";
+import {
+  IGet<%= props.nameCapitalize %>sByParamsQuery,
+  Get<%= props.nameCapitalize %>sByParamsQueryHandler,
+} from "@/domain/query/get-<%= props.name %>-by-params.query";
+import {
+  IGet<%= props.nameCapitalize %>ByCodeQuery,
+  Get<%= props.nameCapitalize %>ByCodeQueryHandler,
+} from '@/domain/query/get-<%= props.name %>-by-code.query';
+
+import { I<%= props.nameCapitalize %>Repository } from "@/domain/repository/<%= props.name %>-repository.interface";
+import { <%= props.nameCapitalize %>Repository } from "@/infra/<%= props.name %>/repository/<%= props.name %>.repository";
+import { <%= props.nameCapitalize %>Controller } from "@/application/controllers/<%= props.name %>.controller";
+
+@Module({
+  imports: [configReadWriteModule],
+  controllers: [<%= props.nameCapitalize %>Controller],
+  providers: [
+    {
+      provide: IGet<%= props.nameCapitalize %>ByIdQuery,
+      useClass: Get<%= props.nameCapitalize %>ByIdQueryHandler,
+    },
+    {
+      provide: IGet<%= props.nameCapitalize %>sByParamsQuery,
+      useClass: Get<%= props.nameCapitalize %>sByParamsQueryHandler,
+    },
+    {
+      provide: IGet<%= props.nameCapitalize %>ByCodeQuery,
+      useClass: Get<%= props.nameCapitalize %>ByCodeQueryHandler,
+    },
+    {
+      provide: ICreate<%= props.nameCapitalize %>Command,
+      useClass: Create<%= props.nameCapitalize %>CommandHandler,
+    },
+    {
+      provide: IUpdate<%= props.nameCapitalize %>Command,
+      useClass: Update<%= props.nameCapitalize %>CommandHandler,
+    },
+    {
+      provide: IDelete<%= props.nameCapitalize %>Command,
+      useClass: Delete<%= props.nameCapitalize %>CommandHandler,
+    },
+    {
+      provide: I<%= props.nameCapitalize %>Repository,
+      useClass: <%= props.nameCapitalize %>Repository,
+    },
+    {
+      provide: ILogger,
+      useClass: WinstonLoggerAdapter,
+    },
+    PrismaAdapter,
+  ],
+})
+export class AppTestRWModule {}

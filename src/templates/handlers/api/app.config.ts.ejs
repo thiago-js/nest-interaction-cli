@@ -1,0 +1,22 @@
+import { ConfigModule } from '@nestjs/config'
+
+const {
+  DATABASE_DIALECT,
+  DATABASE_USER,
+  DATABASE_PASSWORD,
+  DATABASE_HOST,
+  DATABASE_PORT,
+  DATABASE_NAME,
+  DATABASE_SCHEMA,
+} = process.env
+
+const environments = () => ({
+  DATABASE: {
+    IS_READ_ONLY: Boolean(process.env.DATABASE_READ_ONLY) || false,
+    URL: `${DATABASE_DIALECT}://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?schema=${DATABASE_SCHEMA}`,
+  },
+})
+
+export const configModule = ConfigModule.forRoot({
+  load: [environments],
+})

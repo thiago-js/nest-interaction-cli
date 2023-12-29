@@ -1,0 +1,97 @@
+import { v4 as uuidv4 } from "uuid";
+import { Test, TestingModule } from "@nestjs/testing";
+import { instanceToPlain } from "class-transformer";
+import { ILogger } from "@/infra/logger/logger.client";
+import { AppTestRWModule } from "@/test/unit/app-test-RW.module";
+import { Create<%= props.nameCapitalize %>BodyRequest } from "@/application/controllers/request/body/create-<%= props.name %>.body.request";
+import { <%= props.nameCapitalize %>Response } from "@/application/controllers/response/<%= props.name %>.response";
+import { ICreate<%= props.nameCapitalize %>Command } from "@/domain/command/create-<%= props.name %>.command";
+import { IDelete<%= props.nameCapitalize %>Command } from "@/domain/command/delete-<%= props.name %>.command";
+import { IUpdate<%= props.nameCapitalize %>Command } from "@/domain/command/update-<%= props.name %>.command";
+import { IGet<%= props.nameCapitalize %>ByIdQuery } from "@/domain/query/get-<%= props.name %>-by-id.query";
+import { IGet<%= props.nameCapitalize %>sByParamsQuery } from "@/domain/query/get-<%= props.name %>-by-params.query";
+import { <%= props.nameCapitalize %>Fixture } from "@/test/unit/fixture/<%= props.name %>.fixture";
+import { <%= props.nameCapitalize %>Controller } from "@/application/controllers/<%= props.name %>.controller";
+
+describe("<%= props.nameCapitalize %>Controller", () => {
+  let mock<%= props.nameCapitalize %>: any = {
+    ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+  };
+
+  let deleteMock<%= props.nameCapitalize %>: any = {
+    ...<%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture(),
+    <%= props.name %>Uid: uuidv4(),
+  };
+
+  let controller: <%= props.nameCapitalize %>Controller;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppTestRWModule],
+    })
+      .overrideProvider(IGet<%= props.nameCapitalize %>ByIdQuery)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(mock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(IGet<%= props.nameCapitalize %>sByParamsQuery)
+      .useValue({
+        execute: jest.fn().mockResolvedValue([mock<%= props.nameCapitalize %>]),
+      })
+      .overrideProvider(ICreate<%= props.nameCapitalize %>Command)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(mock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(IUpdate<%= props.nameCapitalize %>Command)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(mock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(IDelete<%= props.nameCapitalize %>Command)
+      .useValue({
+        execute: jest.fn().mockResolvedValue(deleteMock<%= props.nameCapitalize %>),
+      })
+      .overrideProvider(ILogger)
+      .useValue({
+        log: jest.fn(),
+      })
+      .compile();
+
+    controller = module.get<<%= props.nameCapitalize %>Controller>(<%= props.nameCapitalize %>Controller);
+  });
+
+  it("should be defined", () => {
+    expect(controller).toBeDefined();
+  });
+
+  it("should create a <%= props.name %>", async () => {
+    const create: Create<%= props.nameCapitalize %>BodyRequest = {
+      ...mock<%= props.nameCapitalize %>,
+    };
+
+    const result = await controller.create<%= props.nameCapitalize %>(create);
+
+    expect(result.body).toEqual(
+      instanceToPlain(<%= props.nameCapitalize %>Response.toResponse(mock<%= props.nameCapitalize %>))
+    );
+  });
+
+  it("should update a <%= props.name %>", async () => {
+    const update: Create<%= props.nameCapitalize %>BodyRequest = {
+      ...mock<%= props.nameCapitalize %>,
+    };
+
+    const id = "mockId";
+    const result = await controller.update<%= props.nameCapitalize %>(id, update);
+
+    expect(result.body).toEqual(
+      instanceToPlain(<%= props.nameCapitalize %>Response.toResponse(mock<%= props.nameCapitalize %>))
+    );
+  });
+
+  it("should delete a <%= props.name %>", async () => {
+    const result = await controller.delete<%= props.nameCapitalize %>(
+      deleteMock<%= props.nameCapitalize %>.<%= props.name %>Uid
+    );
+
+    expect(result).toEqual(result);
+  });
+});

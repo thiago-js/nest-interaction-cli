@@ -1,0 +1,70 @@
+import { <%= props.nameCapitalize %>Response } from "@/application/controllers/response/<%= props.name %>.response";
+import { <%= props.nameCapitalize %>Entity } from "@/domain/entities/<%= props.name %>.entity";
+import { <%= props.nameCapitalize %>Fixture } from "@/test/unit/fixture/<%= props.name %>.fixture";
+
+describe("<%= props.nameCapitalize %>Response", () => {
+  let sut: <%= props.nameCapitalize %>Response;
+
+  beforeEach(async () => {
+    sut = new <%= props.nameCapitalize %>Response();
+  });
+
+  it("should be defined", () => {
+    expect(sut).toBeDefined();
+  });
+
+  it("should be return the correct value when pass mappers", () => {
+    const _<%= props.name %> = <%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture();
+    const composed<%= props.nameCapitalize %> = [
+      _<%= props.name %>,
+      _<%= props.name %>,
+      _<%= props.name %>,
+      _<%= props.name %>,
+      _<%= props.name %>,
+      _<%= props.name %>,
+    ];
+
+    expect(<%= props.nameCapitalize %>Response.toResponse(composed<%= props.nameCapitalize %>)).toEqual(
+      composed<%= props.nameCapitalize %>
+    );
+  });
+
+  it("should be return the correct list when pass mappers <%= props.nameCapitalize %>Entity", () => {
+    const _<%= props.name %> = <%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture();
+    const composed<%= props.nameCapitalize %> = [
+      <%= props.nameCapitalize %>Entity.deserialize(_<%= props.name %>),
+      <%= props.nameCapitalize %>Entity.deserialize(_<%= props.name %>),
+      <%= props.nameCapitalize %>Entity.deserialize(_<%= props.name %>),
+      <%= props.nameCapitalize %>Entity.deserialize(_<%= props.name %>),
+      <%= props.nameCapitalize %>Entity.deserialize(_<%= props.name %>),
+      <%= props.nameCapitalize %>Entity.deserialize(_<%= props.name %>),
+    ];
+
+    const expect<%= props.nameCapitalize %> = [
+      <%= props.nameCapitalize %>Response.toResponse(_<%= props.name %>),
+      <%= props.nameCapitalize %>Response.toResponse(_<%= props.name %>),
+      <%= props.nameCapitalize %>Response.toResponse(_<%= props.name %>),
+      <%= props.nameCapitalize %>Response.toResponse(_<%= props.name %>),
+      <%= props.nameCapitalize %>Response.toResponse(_<%= props.name %>),
+      <%= props.nameCapitalize %>Response.toResponse(_<%= props.name %>),
+    ];
+
+    expect(<%= props.nameCapitalize %>Response.toResponse(composed<%= props.nameCapitalize %>)).toEqual(
+      expect<%= props.nameCapitalize %>
+    );
+  });
+
+  it("should be return the correct value when pass mappers <%= props.nameCapitalize %>Entity", () => {
+    const composed<%= props.nameCapitalize %> = <%= props.nameCapitalize %>Entity.deserialize(
+      <%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture()
+    );
+
+    const expect<%= props.nameCapitalize %> = <%= props.nameCapitalize %>Response.toResponse(
+      <%= props.nameCapitalize %>Fixture.get<%= props.nameCapitalize %>Fixture()
+    );
+
+    expect(<%= props.nameCapitalize %>Response.toResponse(composed<%= props.nameCapitalize %>)).toEqual(
+      expect<%= props.nameCapitalize %>
+    );
+  });
+});

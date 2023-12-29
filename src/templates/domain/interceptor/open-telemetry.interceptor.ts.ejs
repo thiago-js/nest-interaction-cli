@@ -1,0 +1,69 @@
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+} from "@nestjs/common";
+import { Request, Response } from "express";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
+import { trace } from "@opentelemetry/api";
+import { ILogger } from "@/infra/logger/logger.client";
+import { OpenTelemetryException } from "@/domain/exceptions/open-telemetry.exception";
+
+@Injectable()
+export class OpenTelemetryInterceptor implements NestInterceptor {
+  private readonly project: string;
+
+  constructor(private readonly logger: ILogger) {
+    this.project = "@commercial-model-management-serverless/country";
+  }
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    try {
+      const req = context.switchToHttp().getRequest<Request>();
+      const res = context.switchToHttp().getResponse<Response>();
+
+      const tracer = trace.getTracer(this.project);
+      const span = tracer.startSpan(this.project);
+
+      span.setAttribute(
+        `${this.project}-application-body`,
+        JSON.stringify(req.body)
+      );
+      span.setAttribute(
+        `${this.project}-application-headers`,
+        JSON.stringify(req.headers)
+      );
+      span.setAttribute(
+        `${this.project}-application-x-api-key`,
+        req?.headers["x-api-key"] || "unknown key"
+      );
+
+      return next.handle().pipe(
+        tap((data) => {
+          span.setAttribute(
+            `${this.project}-application-result-status-code`,
+            res.statusCode
+          );
+          span.setAttribute(
+            `${this.project}-application-result-body`,
+            JSON.stringify(data)
+          );
+
+          span.end();
+
+          this.logger.log(`open telemetry for ${this.project} is working`);
+        })
+      );
+    } catch (error) {
+      this.logger.error(`open telemetry for ${this.project} is not working`);
+
+      throw new OpenTelemetryException(
+        `Error when try to start to open-telemetry, message: ${JSON.stringify(
+          error
+        )}`
+      );
+    }
+  }
+}

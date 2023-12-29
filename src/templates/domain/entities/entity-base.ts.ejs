@@ -1,0 +1,37 @@
+export type BaseProps = {
+  id?: string
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export type BasePlainProps = {
+  id?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export abstract class Entity<CL, PR, PO> {
+  props: PR & BaseProps
+
+  constructor(props: PR) {
+    this.props = {
+      ...props,
+    }
+  }
+
+  get id(): string {
+    return this.props.id
+  }
+
+  get createdAt(): Date {
+    return this.props.createdAt
+  }
+
+  get updatedAt(): Date {
+    return this.props.updatedAt
+  }
+
+  abstract deserialize(object: PO): CL
+
+  abstract serialize(): PO
+}
