@@ -3,7 +3,9 @@ import { IsOptional } from "class-validator";
 
 export class Update<%= props.nameCapitalize %>BodyRequest extends Create<%= props.nameCapitalize %>BodyRequest {
     <% props.proprierties.forEach(function(prop) { %>
+    <% if (prop.isOptional) { %>
     @IsOptional()
+    <% } %>
     <%= prop.nameCamelCase %>: <%= prop.type.toLowerCase() %>;
     <% }); %>
 }

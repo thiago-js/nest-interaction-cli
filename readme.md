@@ -26,14 +26,10 @@ NIC allows the specification of a template schema for project creation. You can 
 The `schema.txt` file should follow a specific format, using snake case for property names and indicating data types. Additionally, you can mark fields as optional using a `?`. Here is an example of how the schema can be structured:
 
 ```
-country_uid: ?string
-country: number
-country_name: string
-language_id: string
+uuid: ?string
+name: string
+age: number
 language_code: string
-currency: string
-iso_code: string
-timezone: string
 ```
 
 ## Getting Started

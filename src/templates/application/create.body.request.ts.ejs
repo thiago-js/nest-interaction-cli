@@ -8,6 +8,7 @@ export class Create<%= props.nameCapitalize %>BodyRequest {
     @IsOptional()
   <% } %>
   @Is<%= prop.type %>()
+  @Type(() => <%= prop.type %>)
   @Expose({ name: '<%= prop.nameSnakeCase %>' })
   @ApiProperty({
     name: '<%= prop.nameSnakeCase %>',
